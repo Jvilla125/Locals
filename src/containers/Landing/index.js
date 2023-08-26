@@ -13,13 +13,14 @@ import { useFormik } from "formik";
 
 
 const Landing = () => {
+  // States for registering
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('');
 
   const formik = useFormik({
     initialValues: {
       email: undefined,
-      password: undefined
+      password: undefined,
     },
     validate: (values) => {
       const errors = {}
@@ -32,47 +33,50 @@ const Landing = () => {
       return errors;
     },
     onSubmit: async (values) => {
-    const { email, password } = values;
+      const { email, password } = values;
+      // Registering a new user
+      await createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user, "user created");
+          // navigate("/login")
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+          // ..
+        });
 
-    await createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        console.log(user);
-        // navigate("/login")
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-        // ..
-      });
+        // User logging in with existing credentials 
+        await signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          console.log(user, "user logging in")
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+        });
+      }
 
-       // signInWithEmailAndPassword(auth, email, password)
-    //   .then((userCredential) => {
-    //     // Signed in 
-    //     const user = userCredential.user;
-    //     // ...
-    //   })
-    //   .catch((error) => {
-    //     const errorCode = error.code;
-    //     const errorMessage = error.message;
-    //   });
-
-    // onAuthStateChanged(auth, (user) => {
-    //   if (user) {
-    //     // User is signed in, see docs for a list of available properties
-    //     // https://firebase.google.com/docs/reference/js/auth.user
-    //     const uid = user.uid;
-    //     // ...
-    //   } else {
-    //     // User is signed out
-    //     // ...
-    //   }
-    // });
+      // onAuthStateChanged(auth, (user) => {
+      //   if (user) {
+      //     // User is signed in, see docs for a list of available properties
+      //     // https://firebase.google.com/docs/reference/js/auth.user
+      //     const uid = user.uid;
+      //     // ...
+      //   } else {
+      //     // User is signed out
+      //     // ...
+      //   }
+      // });
     }
-  });
+  );
 
   return (
     <>
@@ -96,25 +100,40 @@ const Landing = () => {
             justifyContent: "space-between",
           }}
         >
+          {/* Sign in Feature */}
           <Typography
             sx={{ py: 2, fontSize: "h5.fontSize", fontFamily: "Pacifico" }}
           >
             Sign In
           </Typography>
-          <TextField label="Username" />
+          <TextField 
+          type="email"
+          label="Email"
+          required
+          value={formik.values.email}
+          onChange={(e) => formik.setFieldValue("email", e.target.value)}
+          />
 
-          <TextField label="Password" />
+          <TextField 
+          label="Password"
+          type="password"
+          required
+          value={formik.values.password}
+          onChange={(e) => formik.setFieldValue("password", e.target.value)}
+          />
           <Typography>
             <a href="#">Forgot Password?</a>
           </Typography>
-          <Button>Login</Button>
+          <Button variant="contained" onClick={formik.handleSubmit}>Login</Button>
         </Box>
 
+        {/* Register Feature */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             boxSizing: "border-box",
+            p: 4,
           }}
         >
           <TextField
@@ -122,31 +141,31 @@ const Landing = () => {
             label="Email address"
             value={formik.values.email}
             onChange={(e) => formik.setFieldValue("email", e.target.value)}
-            required
+            // required
             placeholder="Email address"
-            error = {Boolean(formik.errors.email)}
-            helperText = {formik.errors.email}
+            error={Boolean(formik.errors.email)}
+            helperText={formik.errors.email}
           />
           <TextField
             type="password"
             label="Create password"
             value={formik.values.password}
             onChange={(e) => formik.setFieldValue("password", e.target.value)}
-            required
+            // required
             placeholder="Password"
-            error = {Boolean(formik.errors.password)}
-            helperText = {formik.errors.password}
+            error={Boolean(formik.errors.password)}
+            helperText={formik.errors.password}
           />
         </Box>
         <Box
           sx={{
-            height: "50%",
+            height: "20%",
             boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
             justifyContent: "flex-end",
             alignItems: "center",
-            p: 18,
+            p: 12,
           }}
         >
           <Typography sx={{ fontSize: "h5.fontSize", fontFamily: "Pacifico" }}>
@@ -157,11 +176,11 @@ const Landing = () => {
           </Button>
         </Box>
       </Card>
+
       <Grid container rowSpacing={12}>
         <Grid item xs={12} sx={gridstyles}>
           <Title title="Locals" />
         </Grid>
-
         <Grid item xs={12} sx={gridstyles}>
           <Hero
             title="Tour your Destination"
@@ -170,7 +189,6 @@ const Landing = () => {
             orientation="right"
           />
         </Grid>
-
         <Grid item xs={12} sx={gridstyles}>
           <Hero
             title="Become a Local Guide"
