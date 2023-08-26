@@ -50,8 +50,8 @@ const Landing = () => {
           // ..
         });
 
-        // User logging in with existing credentials 
-        await signInWithEmailAndPassword(auth, email, password)
+      // User logging in with existing credentials 
+      await signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in 
           const user = userCredential.user;
@@ -62,21 +62,26 @@ const Landing = () => {
           const errorCode = error.code;
           const errorMessage = error.message;
         });
-      }
 
-      // onAuthStateChanged(auth, (user) => {
-      //   if (user) {
-      //     // User is signed in, see docs for a list of available properties
-      //     // https://firebase.google.com/docs/reference/js/auth.user
-      //     const uid = user.uid;
-      //     // ...
-      //   } else {
-      //     // User is signed out
-      //     // ...
-      //   }
-      // });
+      // Getting users email
+      const user = auth.currentUser
+      onAuthStateChanged(auth, (user) => {
+        if (user !== null) {
+          // User is signed in, see docs for a list of available properties
+          // https://firebase.google.com/docs/reference/js/auth.user
+          const email = user.email;
+          console.log(email, "<- users email")
+          const uid = user.uid;
+          // ...
+        } else {
+          // User is signed out
+          // ...
+        }
+      });
     }
-  );
+  });
+
+
 
   return (
     <>
@@ -106,20 +111,20 @@ const Landing = () => {
           >
             Sign In
           </Typography>
-          <TextField 
-          type="email"
-          label="Email"
-          required
-          value={formik.values.email}
-          onChange={(e) => formik.setFieldValue("email", e.target.value)}
+          <TextField
+            type="email"
+            label="Email"
+            required
+            value={formik.values.email}
+            onChange={(e) => formik.setFieldValue("email", e.target.value)}
           />
 
-          <TextField 
-          label="Password"
-          type="password"
-          required
-          value={formik.values.password}
-          onChange={(e) => formik.setFieldValue("password", e.target.value)}
+          <TextField
+            label="Password"
+            type="password"
+            required
+            value={formik.values.password}
+            onChange={(e) => formik.setFieldValue("password", e.target.value)}
           />
           <Typography>
             <a href="#">Forgot Password?</a>
