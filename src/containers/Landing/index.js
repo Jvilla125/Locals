@@ -17,7 +17,7 @@ const Landing = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('');
 
-  const formik = useFormik({
+  const signUp = useFormik({
     initialValues: {
       email: undefined,
       password: undefined,
@@ -49,8 +49,27 @@ const Landing = () => {
           console.log(errorCode, errorMessage);
           // ..
         });
+    }
+  });
 
-      // User logging in with existing credentials 
+  const signIn = useFormik({
+    initialValues: {
+      email: undefined,
+      password: undefined,
+    },
+    validate: (values) => {
+      const errors = {}
+      if (!values.email) {
+        errors.email = "Email is required"
+      }
+      if (!values.password) {
+        errors.password = "Password is required"
+      }
+      return errors;
+    },
+    onSubmit: async (values) => {
+      const { email, password } = values;
+      // Registering a new user
       await signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in 
@@ -62,26 +81,25 @@ const Landing = () => {
           const errorCode = error.code;
           const errorMessage = error.message;
         });
-
-      // Getting users email
-      const user = auth.currentUser
-      onAuthStateChanged(auth, (user) => {
-        if (user !== null) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/auth.user
-          const email = user.email;
-          console.log(email, "<- users email")
-          const uid = user.uid;
-          // ...
-        } else {
-          // User is signed out
-          // ...
-        }
-      });
     }
   });
 
 
+  // // Getting users email
+  // const user = auth.currentUser
+  // onAuthStateChanged(auth, (user) => {
+  //   if (user !== null) {
+  //     // User is signed in, see docs for a list of available properties
+  //     // https://firebase.google.com/docs/reference/js/auth.user
+  //     const email = user.email;
+  //     console.log(email, "<- users email")
+  //     const uid = user.uid;
+  //     // ...
+  //   } else {
+  //     // User is signed out
+  //     // ...
+  //   }
+  // });
 
   return (
     <>
@@ -115,21 +133,21 @@ const Landing = () => {
             type="email"
             label="Email"
             required
-            value={formik.values.email}
-            onChange={(e) => formik.setFieldValue("email", e.target.value)}
+            value={signIn.values.email}
+            onChange={(e) => signIn.setFieldValue("email", e.target.value)}
           />
 
           <TextField
             label="Password"
             type="password"
             required
-            value={formik.values.password}
-            onChange={(e) => formik.setFieldValue("password", e.target.value)}
+            value={signIn.values.password}
+            onChange={(e) => signIn.setFieldValue("password", e.target.value)}
           />
           <Typography>
             <a href="#">Forgot Password?</a>
           </Typography>
-          <Button variant="contained" onClick={formik.handleSubmit}>Login</Button>
+          <Button variant="contained" onClick={signIn.handleSubmit}>Login</Button>
         </Box>
 
         {/* Register Feature */}
@@ -144,22 +162,22 @@ const Landing = () => {
           <TextField
             type="email"
             label="Email address"
-            value={formik.values.email}
-            onChange={(e) => formik.setFieldValue("email", e.target.value)}
+            value={signUp.values.email}
+            onChange={(e) => signUp.setFieldValue("email", e.target.value)}
             // required
             placeholder="Email address"
-            error={Boolean(formik.errors.email)}
-            helperText={formik.errors.email}
+            error={Boolean(signUp.errors.email)}
+            helperText={signUp.errors.email}
           />
           <TextField
             type="password"
             label="Create password"
-            value={formik.values.password}
-            onChange={(e) => formik.setFieldValue("password", e.target.value)}
+            value={signUp.values.password}
+            onChange={(e) => signUp.setFieldValue("password", e.target.value)}
             // required
             placeholder="Password"
-            error={Boolean(formik.errors.password)}
-            helperText={formik.errors.password}
+            error={Boolean(signUp.errors.password)}
+            helperText={signUp.errors.password}
           />
         </Box>
         <Box
@@ -176,7 +194,7 @@ const Landing = () => {
           <Typography sx={{ fontSize: "h5.fontSize", fontFamily: "Pacifico" }}>
             Don't have an account?
           </Typography>
-          <Button sx={{ width: "100%" }} variant="contained" onClick={formik.handleSubmit}>
+          <Button sx={{ width: "100%" }} variant="contained" onClick={signUp.handleSubmit}>
             Register
           </Button>
         </Box>
